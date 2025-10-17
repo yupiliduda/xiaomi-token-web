@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="alternate icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff6900;
+            --primary-dark: #e55a00;
+            --primary-light: #ff8533;
+            --bg: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-elevated: #ffffff;
+            --text: #111111;
+            --text-secondary: #6c757d;
+            --text-muted: #8e9297;
+            --border: #e1e5e9;
+            --border-light: #f1f3f4;
+            --success: #22c55e;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --radius: 12px;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0d1117;
+                --bg-secondary: #161b22;
+                --bg-elevated: #21262d;
+                --text: #f0f6fc;
+                --text-secondary: #8b949e;
+                --text-muted: #656d76;
+                --border: #30363d;
+                --border-light: #21262d;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .card-content {
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .auth-tab:hover {
+            color: var(--text);
+        }
+
+        .auth-content {
+            display: none;
+        }
+
+        .auth-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+        }
+
+        .button-secondary {
+            background: var(--bg-secondary);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .button-secondary:hover {
+            background: var(--border-light);
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(255, 105, 0, 0.05);
+        }
+
+        .drop-zone-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert.success {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .alert.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-container {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .progress-message {
+            text-align: center;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .devices-section {
+            margin-top: 2rem;
+        }
+
+        .devices-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .devices-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .devices-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .devices-controls select {
+            padding: 0.5rem 1rem;
+            padding-right: 2.5rem;
+            font-size: 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background-color: var(--bg-secondary);
+            color: var(--text);
+            height: 36px;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+        }
+
+        .devices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .device-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .device-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .device-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .device-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+
+        .status-dot.online {
+            background: var(--success);
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        }
+
+        .device-info {
+            space-y: 0.75rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: var(--text);
+            background: var(--bg-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            max-width: 200px;
+            text-align: right;
+            word-break: break-all;
+        }
+
+        .info-value:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .privacy-notice {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .privacy-notice h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+
+        .privacy-notice .icon {
+            font-size: 1.25rem;
+        }
+
+        .privacy-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .privacy-section h4 {
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .privacy-section p {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+        }
+
+        .footer p {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .language-switcher {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+
+        .language-switcher button {
+            background: var(--bg-elevated);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .devices-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .devices-controls {
+                justify-content: space-between;
+            }
+
+            .devices-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .language-switcher {
+                position: static;
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+
+            .privacy-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-switcher">
+        <button onclick="switchLanguage()">{{LANGUAGE_SWITCH_TEXT}}</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>{{TITLE}}</h1>
+            <p>{{SUBTITLE}}</p>
+        </div>
+        
+        <div id="authCard" class="card">
+            <div class="card-header">
+                <div class="card-icon">🔐</div>
+                <h2>{{AUTHENTICATION}}</h2>
+            </div>
+            <div class="card-content">
+                <div id="authTabs" class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchTab('login')">{{LOGIN_TAB}}</button>
+                    <button class="auth-tab" onclick="switchTab('session')">{{SESSION_TAB}}</button>
+                </div>
+                
+                <div id="loginTab" class="auth-content active">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="username">{{USERNAME}}</label>
+                            <input type="text" id="username" name="username" placeholder="{{USERNAME_PLACEHOLDER}}" required>
+                            <small>{{USERNAME_HINT}}</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">{{PASSWORD}}</label>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="server">{{SERVER_REGION}}</label>
+                            <select id="server" name="server" title="{{SERVER_HINT1}}">
+                                <option value="cn">{{REGION_CHINA}}</option>
+                                <option value="de">{{REGION_GERMANY}}</option>
+                                <option value="us">{{REGION_US}}</option>
+                                <option value="ru">{{REGION_RUSSIA}}</option>
+                                <option value="tw">{{REGION_TAIWAN}}</option>
+                                <option value="sg">{{REGION_SINGAPORE}}</option>
+                                <option value="in">{{REGION_INDIA}}</option>
+                                <option value="i2">{{REGION_INTERNATIONAL}}</option>
+                            </select>
+                            <small style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                                💡 {{SERVER_HINT1}}<br>
+                                {{SERVER_HINT2}}
+                            </small>
+                        </div>
+                        <button type="submit" id="loginBtn">{{LOGIN}}</button>
+                    </form>
+                </div>
+                
+                <div id="sessionTab" class="auth-content">
+                    <div id="dropZone" class="drop-zone">
+                        <div class="drop-zone-icon">📁</div>
+                        <h3 style="margin-bottom: 0.5rem;">{{DROP_ZONE_TITLE}}</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">{{DROP_ZONE_SUBTITLE}}</p>
+                        <input type="file" id="loadSession" accept=".json" style="display: none;">
+                        <button class="button-secondary" onclick="document.getElementById('loadSession').click()">
+                            {{CHOOSE_FILE}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="verifySection" class="card hidden">
+            <div class="card-header">
+                <div class="card-icon">🔐</div>
+                <h2>{{TWO_FACTOR_TITLE}}</h2>
+            </div>
+            <div class="card-content">
+                <p style="margin-bottom: 1rem;">{{TWO_FACTOR_STEPS}}</p>
+                <ol style="margin-bottom: 1.5rem; padding-left: 1.5rem; color: var(--text-secondary);">
+                    <li style="margin-bottom: 0.5rem;">{{TWO_FACTOR_STEP1}}</li>
+                    <li style="margin-bottom: 0.5rem;">{{TWO_FACTOR_STEP2}}</li>
+                    <li style="margin-bottom: 0.5rem;">{{TWO_FACTOR_STEP3}}</li>
+                    <li style="margin-bottom: 0.5rem;">{{TWO_FACTOR_STEP4}}</li>
+                </ol>
+                <form id="verifyForm">
+                    <div class="form-group">
+                        <label for="verifyCode">{{VERIFICATION_CODE}}</label>
+                        <input type="text" id="verifyCode" name="verifyCode" placeholder="{{VERIFICATION_CODE_PLACEHOLDER}}" maxlength="6" pattern="[0-9]{6}" required>
+                    </div>
+                    <button type="submit">{{VERIFY}}</button>
+                </form>
+            </div>
+        </div>
+        
+        <div id="devicesSection" class="devices-section hidden">
+            <div class="devices-header">
+                <h3>{{DEVICES_TITLE}}</h3>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <select id="serverSelector" style="padding: 0.5rem 1rem; padding-right: 2.5rem; font-size: 0.875rem; border: 1px solid var(--border); border-radius: var(--radius); background-color: var(--bg-secondary); color: var(--text); height: 36px; -webkit-appearance: none; appearance: none; background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 0.5rem center;" onchange="loadDevices(false)" title="{{SERVER_HINT1}}">
+                        <option value="cn">{{REGION_CHINA}}</option>
+                        <option value="de">{{REGION_GERMANY}}</option>
+                        <option value="us">{{REGION_US}}</option>
+                        <option value="ru">{{REGION_RUSSIA}}</option>
+                        <option value="tw">{{REGION_TAIWAN}}</option>
+                        <option value="sg">{{REGION_SINGAPORE}}</option>
+                        <option value="in">{{REGION_INDIA}}</option>
+                        <option value="i2">{{REGION_INTERNATIONAL}}</option>
+                    </select>
+                    <button id="refreshDevicesBtn" class="button-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem; white-space: nowrap; height: 36px;" onclick="loadDevices(false)">🔄 {{REFRESH}}</button>
+                </div>
+            </div>
+            <div id="currentServerInfo" style="margin: 1rem 0; padding: 0.75rem; background: var(--bg); border-radius: var(--radius); font-size: 0.875rem; color: var(--text-secondary); text-align: center;"></div>
+            <div id="devicesList" class="devices-grid"></div>
+        </div>
+        
+        <div id="alerts"></div>
+        
+        <div class="privacy-notice">
+            <h3><span class="icon">🔒</span> {{PRIVACY_TITLE}}</h3>
+            <div class="privacy-content">
+                <div class="privacy-section">
+                    <h4>{{PRIVACY_WHAT}}</h4>
+                    <p>{{PRIVACY_WHAT_DESC}}</p>
+                </div>
+                
+                <div class="privacy-section">
+                    <h4>{{PRIVACY_HOW}}</h4>
+                    <p>{{PRIVACY_HOW_DESC}}</p>
+                </div>
+                
+                <div class="privacy-section">
+                    <h4>{{PRIVACY_WHERE}}</h4>
+                    <p>{{PRIVACY_WHERE_DESC}}</p>
+                </div>
+                
+                <div class="privacy-section">
+                    <h4>{{PRIVACY_WHY}}</h4>
+                    <p>{{PRIVACY_WHY_DESC}}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>{{FOOTER_TEXT}}</p>
+            <p>{{FOOTER_VERSION}}</p>
+        </div>
+    </div>
+    
+    <script>
+        // Translations
+        const translations = {{TRANSLATIONS_JSON}};
+        let currentLang = '{{LANG}}';
+        
+        // Translation function
+        function t(key) {
+            return translations[currentLang]?.[key] || translations.en[key] || key;
+        }
+        
+        // Language switching
+        function switchLanguage() {
+            const newLang = currentLang === 'en' ? 'zh' : 'en';
+            window.location.href = newLang === 'zh' ? '/zh' : '/';
+        }
+        
+        // Rest of JavaScript code goes here...
+        {{JAVASCRIPT_CODE}}
+    </script>
+</body>
+</html>

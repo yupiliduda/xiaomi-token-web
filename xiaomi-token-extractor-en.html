@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xiaomi Cloud Tokens Extractor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff6900;
+            --primary-dark: #e55a00;
+            --primary-light: #ff8533;
+            --bg: #000000;
+            --bg-secondary: #111111;
+            --card-bg: #000000;
+            --card-bg-hover: #0a0a0a;
+            --text: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #666666;
+            --border: #333333;
+            --border-light: #222222;
+            --border-hover: #444444;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.3);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.5);
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --gradient: linear-gradient(135deg, #ff6900 0%, #ff8533 100%);
+            --gradient-dark: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 105, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 105, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(255, 133, 51, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            background: linear-gradient(to bottom right, #ffffff 30%, var(--primary) 70%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: var(--border-hover);
+            background: var(--card-bg-hover);
+            transform: translateY(-2px);
+        }
+        
+        .card:hover::before {
+            opacity: 1;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+        }
+        
+        .card h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .auth-tab {
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 400;
+            cursor: pointer;
+            transition: none;
+            display: inline-block;
+            box-shadow: none;
+            transform: none;
+        }
+        
+        .auth-tab:hover {
+            color: var(--text-secondary);
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .auth-tab:active {
+            transform: none;
+        }
+        
+        .auth-tab.active {
+            color: var(--text);
+            font-weight: 500;
+        }
+        
+        .auth-content {
+            display: none;
+        }
+        
+        .auth-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.1);
+        }
+        
+        .form-group small {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        button[type="submit"] {
+            width: 100%;
+        }
+        
+        .button-secondary {
+            background: var(--bg-secondary);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .button-secondary:hover {
+            background: var(--border-light);
+        }
+        
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-xl);
+            padding: 4rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: var(--bg-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .drop-zone::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0.1;
+            transition: transform 0.5s ease;
+        }
+        
+        .drop-zone:hover::before,
+        .drop-zone.drag-over::before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: var(--primary);
+            background: var(--bg-secondary);
+        }
+        
+        .drop-zone-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            filter: grayscale(100%);
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+        
+        .drop-zone:hover .drop-zone-icon {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideInDown 0.3s ease-out;
+        }
+        
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .alert.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        
+        .alert.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress-container {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+        
+        .progress-message {
+            text-align: center;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .devices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .device-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .device-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .device-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+        
+        .device-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+        
+        .status-dot.online {
+            background: var(--success);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+        
+        .device-info {
+            space-y: 0.75rem;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: var(--text);
+            background: var(--bg-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            max-width: 200px;
+            text-align: right;
+            word-break: break-all;
+        }
+        
+        .info-value:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .info-value.token {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .privacy-notice {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+        
+        .privacy-notice h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+        
+        .privacy-notice .icon {
+            font-size: 1.25rem;
+        }
+        
+        .privacy-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .privacy-section h4 {
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .privacy-section p {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+        }
+        
+        .footer p {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .language-switcher {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+        
+        .language-switcher button {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            box-shadow: var(--shadow);
+        }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            
+            .container {
+                padding: 1rem;
+                max-width: 100%;
+            }
+            
+            .header {
+                margin-bottom: 2rem;
+            }
+            
+            .header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .header .subtitle {
+                font-size: 0.875rem;
+            }
+            
+            .card {
+                padding: 1.25rem;
+                margin-bottom: 1rem;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .card-header > div:first-child {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .card-header > div:last-child {
+                margin-top: 0;
+                width: 100%;
+            }
+            
+            .card-header button {
+                width: auto;
+                flex: 1;
+            }
+            
+            /* Stack server controls on mobile */
+            #devicesSection .card-header > div:last-child {
+                flex-direction: column !important;
+                gap: 0.75rem !important;
+            }
+            
+            #serverSelector, #refreshDevicesBtn {
+                width: 100% !important;
+                margin: 0 !important;
+            }
+            
+            .devices-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .language-switcher {
+                position: static;
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+            
+            .privacy-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-switcher">
+        <button onclick="window.open('xiaomi-token-extractor-zh.html', '_self')">中文</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Xiaomi Cloud Tokens Extractor</h1>
+            <p class="subtitle">Extract device tokens and keys from your Xiaomi account</p>
+        </div>
+        
+        <div id="authCard" class="card">
+            <div class="card-header">
+                <div class="card-icon">🔐</div>
+                <h2>Authentication</h2>
+            </div>
+            <div class="card-content">
+                <div id="authTabs" class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchTab('login')">Login with Credentials</button>
+                    <button class="auth-tab" onclick="switchTab('session')">Use Saved Session</button>
+                </div>
+                
+                <div id="loginTab" class="auth-content active">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" placeholder="Email, phone number, or Xiaomi ID" required>
+                            <small>Accepts: Email address, phone number (mostly CN accounts), or Xiaomi account ID</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="server">Server Region</label>
+                            <select id="server" name="server" title="Choose the region where you created your Xiaomi account or where your devices were purchased">
+                                <option value="cn">🇨🇳 China (cn) - Mainland China</option>
+                                <option value="de">🇩🇪 Germany (de) - Europe</option>
+                                <option value="us">🇺🇸 United States (us) - Americas</option>
+                                <option value="ru">🇷🇺 Russia (ru) - Russia/CIS</option>
+                                <option value="tw">🇹🇼 Taiwan (tw) - Taiwan</option>
+                                <option value="sg">🇸🇬 Singapore (sg) - Southeast Asia</option>
+                                <option value="in">🇮🇳 India (in) - India</option>
+                                <option value="i2">🌍 International (i2) - Other regions</option>
+                            </select>
+                            <small style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                                💡 Choose the region where you created your Xiaomi account or where your devices were purchased<br>
+                                You can switch to other regions after login without re-authenticating
+                            </small>
+                        </div>
+                        <button type="submit" id="loginBtn">Login</button>
+                    </form>
+                </div>
+                
+                <div id="sessionTab" class="auth-content">
+                    <div id="dropZone" class="drop-zone">
+                        <div class="drop-zone-icon">📁</div>
+                        <h3 style="margin-bottom: 0.5rem;">Drop session file here</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">or click to browse</p>
+                        <input type="file" id="loadSession" accept=".json" style="display: none;">
+                        <button class="button-secondary" onclick="document.getElementById('loadSession').click()">
+                            Choose File
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="verifySection" class="card hidden">
+            <div class="card-header">
+                <div class="card-icon">🔐</div>
+                <h2>Two-Factor Authentication</h2>
+            </div>
+            <div class="card-content">
+                <p style="margin-bottom: 1rem;">Please follow these steps:</p>
+                <ol style="margin-bottom: 1.5rem; padding-left: 1.5rem; color: var(--text-secondary);">
+                    <li style="margin-bottom: 0.5rem;">Open this URL in your browser:</li>
+                    <li style="margin-bottom: 0.5rem;">Choose your verification method (SMS or Email)</li>
+                    <li style="margin-bottom: 0.5rem;">You'll receive a 6-digit verification code</li>
+                    <li style="margin-bottom: 0.5rem;">DO NOT enter the code on Xiaomi's website!</li>
+                </ol>
+                <form id="verifyForm">
+                    <div class="form-group">
+                        <label for="verifyCode">Verification Code</label>
+                        <input type="text" id="verifyCode" name="verifyCode" placeholder="Enter 6 digits" maxlength="6" pattern="[0-9]{6}" required>
+                    </div>
+                    <button type="submit">Verify</button>
+                </form>
+            </div>
+        </div>
+        
+        <div id="devicesSection" class="card hidden">
+            <div class="card-header" style="margin-bottom: 0; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center;">
+                    <div class="card-icon">📱</div>
+                    <h2 style="margin-bottom: 0;">Devices</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <select id="serverSelector" style="padding: 0.5rem 1rem; padding-right: 2.5rem; font-size: 0.875rem; border: 1px solid var(--border); border-radius: var(--radius); background-color: var(--bg-secondary); color: var(--text); height: 36px; -webkit-appearance: none; appearance: none; background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 0.5rem center;" onchange="loadDevices(false)" title="Choose the region where you created your Xiaomi account or where your devices were purchased">
+                        <option value="cn">🇨🇳 China (cn) - Mainland China</option>
+                        <option value="de">🇩🇪 Germany (de) - Europe</option>
+                        <option value="us">🇺🇸 United States (us) - Americas</option>
+                        <option value="ru">🇷🇺 Russia (ru) - Russia/CIS</option>
+                        <option value="tw">🇹🇼 Taiwan (tw) - Taiwan</option>
+                        <option value="sg">🇸🇬 Singapore (sg) - Southeast Asia</option>
+                        <option value="in">🇮🇳 India (in) - India</option>
+                        <option value="i2">🌍 International (i2) - Other regions</option>
+                    </select>
+                    <button id="refreshDevicesBtn" class="button-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem; white-space: nowrap; height: 36px;" onclick="loadDevices(false)">🔄 Refresh</button>
+                </div>
+            </div>
+            <div id="currentServerInfo" style="margin: 1rem 0; padding: 0.75rem; background: var(--bg); border-radius: var(--radius); font-size: 0.875rem; color: var(--text-secondary); text-align: center;"></div>
+            <div id="devicesList" class="devices-grid"></div>
+        </div>
+        
+        <div id="alerts"></div>
+        
+        <div class="privacy-notice">
+            <h3><span class="icon">🔒</span> Privacy & Security Disclosure</h3>
+            <div class="privacy-content">
+                <div class="privacy-section">
+                    <h4>What This Tool Does</h4>
+                    <p>This tool extracts device tokens and authentication keys from your Xiaomi account. These tokens are used to locally control your Xiaomi smart home devices without going through Xiaomi's cloud servers.</p>
+                </div>
+                
+                <div class="privacy-section">
+                    <h4>How It Works</h4>
+                    <p>Direct communication with Xiaomi servers, no data stored on our servers.</p>
+                </div>
+                
+                <div class="privacy-section">
+                    <h4>Data Location</h4>
+                    <p>All processing happens locally in your browser. Session files remain on your device.</p>
+                </div>
+                
+                <div class="privacy-section">
+                    <h4>Why Use This Tool</h4>
+                    <p>Extract tokens for local device control without cloud dependency.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>This is an unofficial tool not affiliated with Xiaomi. Use at your own risk. The tool replicates the functionality of the Python-based Xiaomi-cloud-tokens-extractor project in a web interface.</p>
+            <p>VERSION 1.2.0</p>
+        </div>
+    </div>
+    
+    <script>
+        // Note: This is a standalone HTML file - you'll need to implement the backend functionality
+        // or modify the API calls to work with your server setup
+        
+        let currentSession = null;
+        let sessionLoadedFromFile = false;
+        let tempClientState = null;
+        let selectedServer = 'cn';
+        let isLoadingDevices = false;
+        
+        function switchTab(tab) {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+        }
+        
+        function showAlert(message, type = 'info') {
+            const alertsContainer = document.getElementById('alerts');
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            
+            // Add appropriate icon
+            let icon = '';
+            switch(type) {
+                case 'success': icon = '✅'; break;
+                case 'error': icon = '❌'; break;
+                case 'warning': icon = '⚠️'; break;
+                case 'info': icon = 'ℹ️'; break;
+            }
+            
+            alert.innerHTML = `${icon} ${message}`;
+            alertsContainer.appendChild(alert);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            showAlert('⚠️ This is a standalone HTML file. Backend functionality needs to be implemented or connected to work properly.', 'warning');
+            
+            // File upload handling
+            const loadSessionInput = document.getElementById('loadSession');
+            const dropZone = document.getElementById('dropZone');
+            
+            loadSessionInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleSessionFile(e.target.files[0]);
+                }
+            });
+            
+            // Drag and drop handling
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+            
+            dropZone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+            });
+            
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type === 'application/json') {
+                    handleSessionFile(files[0]);
+                } else {
+                    showAlert('Please drop a JSON file', 'error');
+                }
+            });
+            
+            dropZone.addEventListener('click', function(e) {
+                if (e.target === dropZone || e.target.closest('.drop-zone')) {
+                    loadSessionInput.click();
+                }
+            });
+        });
+        
+        function handleSessionFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const sessionData = JSON.parse(e.target.result);
+                    // In a real implementation, you would validate and use the session data
+                    showAlert('Session file loaded (demo mode)', 'info');
+                    console.log('Session data:', sessionData);
+                } catch (error) {
+                    showAlert('Invalid session file', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function copyToClipboard(text, elementId) {
+            navigator.clipboard.writeText(text).then(() => {
+                const element = document.getElementById(elementId);
+                element.style.backgroundColor = 'var(--success)';
+                element.style.borderColor = 'var(--success)';
+                element.style.color = 'white';
+                
+                setTimeout(() => {
+                    element.style.backgroundColor = '';
+                    element.style.borderColor = '';
+                    element.style.color = '';
+                }, 1500);
+            }).catch(err => {
+                showAlert('Failed to copy to clipboard', 'error');
+            });
+        }
+        
+        function loadDevices(autoScan = true) {
+            showAlert('🚧 Demo mode: Backend functionality not implemented', 'warning');
+        }
+        
+        // Form submission handling
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showAlert('🚧 Demo mode: Login functionality not implemented', 'warning');
+        });
+        
+        document.getElementById('verifyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showAlert('🚧 Demo mode: 2FA verification not implemented', 'warning');
+        });
+    </script>
+</body>
+</html>
