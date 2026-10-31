@@ -99,8 +99,9 @@ app.get('/', async (c) => {
     let htmlContent: string;
     
     // Check if we're in Bun environment
-    if (typeof Bun !== 'undefined') {
-      htmlContent = await Bun.file('./xiaomi-token-extractor.html').text();
+    const bun = (globalThis as any).Bun;
+    if (bun) {
+      htmlContent = await bun.file('./xiaomi-token-extractor.html').text();
     } else {
       // Node.js environment
       const fs = await import('fs/promises');

@@ -11,4 +11,5 @@ dist/
 !package-lock.json
 !tsconfig.json
 !vercel.json
+!.base44/environment.json
 .vercel
